@@ -58,25 +58,3 @@ export function weekRangeLabel(weekKey: string): string {
   return `${f(start)} a ${f(end)}`;
 }
 
-export function loadWeek(weekKey: string): WeekData {
-  if (typeof window === "undefined") return {};
-  try {
-    return JSON.parse(localStorage.getItem(PREFIX + weekKey) ?? "{}") as WeekData;
-  } catch {
-    return {};
-  }
-}
-
-export function saveWeek(weekKey: string, data: WeekData) {
-  localStorage.setItem(PREFIX + weekKey, JSON.stringify(data));
-}
-
-export function listWeeks(): string[] {
-  if (typeof window === "undefined") return [];
-  const keys: string[] = [];
-  for (let i = 0; i < localStorage.length; i++) {
-    const k = localStorage.key(i);
-    if (k?.startsWith(PREFIX)) keys.push(k.slice(PREFIX.length));
-  }
-  return keys.sort().reverse();
-}
