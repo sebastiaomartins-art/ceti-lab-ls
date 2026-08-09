@@ -76,52 +76,71 @@ function Index() {
   const isCurrentWeek = weekKey === currentWeekKey();
 
   function openWeek(wk: string) {
-    setWeekKey(wk);
-    setData(loadWeek(wk));
     setSelected(null);
+    void refresh(wk);
   }
 
-  function persist(next: WeekData) {
-    setData(next);
-    saveWeek(weekKey, next);
-    setWeeks(listWeeks());
-  }
-
-  function submit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (!selected) return;
+    if (!selected || busy) return;
     if (!form.professor.trim() || !form.turma.trim()) return;
-    const key = `${selected.day}|${selected.slot}`;
-    persist({
-      ...data,
-      [key]: {
-        professor: form.professor.trim(),
-        turma: form.turma.trim(),
-        disciplina: form.disciplina.trim(),
-        criadoEm: new Date().toISOString(),
-      } satisfies Booking,
-    });
-    setForm(emptyForm);
-    setSelected(null);
-    setToast("Agendamento salvo com sucesso.");
+    setBusy(true);
+    try {
+      await addBooking({
+        data: {
+          weekKey,
+          dayId: selected.day,
+          slotId: selected.slot,
+          turma: form.turma.trim(),
+          professor: form.professor.trim(),
+          disciplina: form.disciplina.trim(),
+        },
+      });
+      await refresh();
+      setForm(emptyForm);
+      setSelected(null);
+      setToast("Agendamento salvo com sucesso.");
+    } catch {
+      setToast("Não foi possível salvar. Este horário pode já estar ocupado.");
+    } finally {
+      setBusy(false);
+    }
   }
 
-  function confirmDelete(e: React.FormEvent) {
+  async function confirmDelete(e: React.FormEvent) {
     e.preventDefault();
-    if (!pendingDelete) return;
-    if (pass !== ADMIN_PASSWORD) {
-      setPassError("Senha incorreta.");
-      return;
+    if (!pendingDelete || busy) return;
+    setBusy(true);
+    try {
+      const { ok } = await removeBooking({
+        data: {
+          weekKey,
+          dayId: pendingDelete.day,
+          slotId: pendingDelete.slot,
+          password: pass,
+        },
+      });
+      if (!ok) {
+        setPassError("Senha incorreta.");
+        return;
+      }
+      await refresh();
+      setPendingDelete(null);
+      setPass("");
+      setPassError("");
+      setToast("Professor removido do agendamento.");
+    } catch {
+      setPassError("Não foi possível excluir. Tente novamente.");
+    } finally {
+      setBusy(false);
     }
-    const key = `${pendingDelete.day}|${pendingDelete.slot}`;
-    const next = { ...data };
-    delete next[key];
-    persist(next);
-    setPendingDelete(null);
-    setPass("");
-    setPassError("");
-    setToast("Professor removido do agendamento.");
   }
+
+  async function sair() {
+    await lock({});
+    await router.navigate({ to: "/entrar" });
+  }
+
 
   const stats = useMemo(() => {
     const entries = Object.entries(data);
