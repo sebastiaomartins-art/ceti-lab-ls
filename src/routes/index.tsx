@@ -1,19 +1,22 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useState } from "react";
 import {
-  ADMIN_PASSWORD,
   DAYS,
   SLOTS,
   currentWeekKey,
-  listWeeks,
-  loadWeek,
-  saveWeek,
   weekRangeLabel,
-  type Booking,
   type WeekData,
 } from "@/lib/agenda";
+import {
+  createBooking,
+  deleteBooking,
+  getAgenda,
+  lockSite,
+} from "@/lib/agenda.functions";
 
 export const Route = createFileRoute("/")({
+  loader: () => getAgenda({ data: {} }),
   head: () => ({
     meta: [
       { title: "Agenda do Laboratório de Informática — CETI Landri Sales" },
@@ -27,6 +30,8 @@ export const Route = createFileRoute("/")({
         property: "og:description",
         content: "Agendamento semanal do Laboratório de Informática com impressão e relatórios.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Index,
@@ -35,9 +40,16 @@ export const Route = createFileRoute("/")({
 const emptyForm = { professor: "", turma: "", disciplina: "" };
 
 function Index() {
-  const [weekKey, setWeekKey] = useState(() => currentWeekKey());
-  const [data, setData] = useState<WeekData>({});
-  const [weeks, setWeeks] = useState<string[]>([]);
+  const initial = Route.useLoaderData();
+  const router = useRouter();
+  const fetchAgenda = useServerFn(getAgenda);
+  const addBooking = useServerFn(createBooking);
+  const removeBooking = useServerFn(deleteBooking);
+  const lock = useServerFn(lockSite);
+
+  const [weekKey, setWeekKey] = useState(initial.weekKey);
+  const [data, setData] = useState<WeekData>(initial.week);
+  const [weeks, setWeeks] = useState<string[]>(initial.weeks);
   const [tab, setTab] = useState<"agenda" | "relatorio">("agenda");
   const [selected, setSelected] = useState<{ day: string; slot: string } | null>(null);
   const [form, setForm] = useState(emptyForm);
@@ -45,13 +57,15 @@ function Index() {
   const [pass, setPass] = useState("");
   const [passError, setPassError] = useState("");
   const [toast, setToast] = useState("");
+  const [busy, setBusy] = useState(false);
 
-  useEffect(() => {
-    const wk = currentWeekKey();
-    setWeekKey(wk);
-    setData(loadWeek(wk));
-    setWeeks(listWeeks());
-  }, []);
+  async function refresh(wk = weekKey) {
+    const res = await fetchAgenda({ data: { weekKey: wk } });
+    setWeekKey(res.weekKey);
+    setData(res.week);
+    setWeeks(res.weeks);
+  }
+
 
   useEffect(() => {
     if (!toast) return;
@@ -62,52 +76,71 @@ function Index() {
   const isCurrentWeek = weekKey === currentWeekKey();
 
   function openWeek(wk: string) {
-    setWeekKey(wk);
-    setData(loadWeek(wk));
     setSelected(null);
+    void refresh(wk);
   }
 
-  function persist(next: WeekData) {
-    setData(next);
-    saveWeek(weekKey, next);
-    setWeeks(listWeeks());
-  }
-
-  function submit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (!selected) return;
+    if (!selected || busy) return;
     if (!form.professor.trim() || !form.turma.trim()) return;
-    const key = `${selected.day}|${selected.slot}`;
-    persist({
-      ...data,
-      [key]: {
-        professor: form.professor.trim(),
-        turma: form.turma.trim(),
-        disciplina: form.disciplina.trim(),
-        criadoEm: new Date().toISOString(),
-      } satisfies Booking,
-    });
-    setForm(emptyForm);
-    setSelected(null);
-    setToast("Agendamento salvo com sucesso.");
+    setBusy(true);
+    try {
+      await addBooking({
+        data: {
+          weekKey,
+          dayId: selected.day,
+          slotId: selected.slot,
+          turma: form.turma.trim(),
+          professor: form.professor.trim(),
+          disciplina: form.disciplina.trim(),
+        },
+      });
+      await refresh();
+      setForm(emptyForm);
+      setSelected(null);
+      setToast("Agendamento salvo com sucesso.");
+    } catch {
+      setToast("Não foi possível salvar. Este horário pode já estar ocupado.");
+    } finally {
+      setBusy(false);
+    }
   }
 
-  function confirmDelete(e: React.FormEvent) {
+  async function confirmDelete(e: React.FormEvent) {
     e.preventDefault();
-    if (!pendingDelete) return;
-    if (pass !== ADMIN_PASSWORD) {
-      setPassError("Senha incorreta.");
-      return;
+    if (!pendingDelete || busy) return;
+    setBusy(true);
+    try {
+      const { ok } = await removeBooking({
+        data: {
+          weekKey,
+          dayId: pendingDelete.day,
+          slotId: pendingDelete.slot,
+          password: pass,
+        },
+      });
+      if (!ok) {
+        setPassError("Senha incorreta.");
+        return;
+      }
+      await refresh();
+      setPendingDelete(null);
+      setPass("");
+      setPassError("");
+      setToast("Professor removido do agendamento.");
+    } catch {
+      setPassError("Não foi possível excluir. Tente novamente.");
+    } finally {
+      setBusy(false);
     }
-    const key = `${pendingDelete.day}|${pendingDelete.slot}`;
-    const next = { ...data };
-    delete next[key];
-    persist(next);
-    setPendingDelete(null);
-    setPass("");
-    setPassError("");
-    setToast("Professor removido do agendamento.");
   }
+
+  async function sair() {
+    await lock({});
+    await router.navigate({ to: "/entrar" });
+  }
+
 
   const stats = useMemo(() => {
     const entries = Object.entries(data);
@@ -172,7 +205,14 @@ function Index() {
             >
               Imprimir agenda semanal
             </button>
+            <button
+              onClick={() => void sair()}
+              className="rounded-lg border px-4 py-2 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground"
+            >
+              Sair
+            </button>
           </div>
+
         </div>
       </header>
 
