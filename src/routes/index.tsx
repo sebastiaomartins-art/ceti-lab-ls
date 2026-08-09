@@ -205,7 +205,14 @@ function Index() {
             >
               Imprimir agenda semanal
             </button>
+            <button
+              onClick={() => void sair()}
+              className="rounded-lg border px-4 py-2 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground"
+            >
+              Sair
+            </button>
           </div>
+
         </div>
       </header>
 
