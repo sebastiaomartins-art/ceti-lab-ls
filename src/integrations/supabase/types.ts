@@ -14,7 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      agendamentos: {
+        Row: {
+          created_at: string
+          day_id: string
+          disciplina: string | null
+          id: string
+          professor: string
+          slot_id: string
+          turma: string
+          week_key: string
+        }
+        Insert: {
+          created_at?: string
+          day_id: string
+          disciplina?: string | null
+          id?: string
+          professor: string
+          slot_id: string
+          turma: string
+          week_key: string
+        }
+        Update: {
+          created_at?: string
+          day_id?: string
+          disciplina?: string | null
+          id?: string
+          professor?: string
+          slot_id?: string
+          turma?: string
+          week_key?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
