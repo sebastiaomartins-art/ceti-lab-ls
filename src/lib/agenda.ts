@@ -35,8 +35,8 @@ export type Booking = {
 
 export type WeekData = Record<string, Booking>; // key: `${dayId}|${slotId}`
 
-export const ADMIN_PASSWORD = "Landri26@";
-const PREFIX = "ceti-lab-agenda:";
+
+
 
 /** Monday of the current week, ISO yyyy-mm-dd */
 export function currentWeekKey(d = new Date()): string {
