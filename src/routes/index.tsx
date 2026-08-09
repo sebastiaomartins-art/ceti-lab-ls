@@ -1,19 +1,22 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useState } from "react";
 import {
-  ADMIN_PASSWORD,
   DAYS,
   SLOTS,
   currentWeekKey,
-  listWeeks,
-  loadWeek,
-  saveWeek,
   weekRangeLabel,
-  type Booking,
   type WeekData,
 } from "@/lib/agenda";
+import {
+  createBooking,
+  deleteBooking,
+  getAgenda,
+  lockSite,
+} from "@/lib/agenda.functions";
 
 export const Route = createFileRoute("/")({
+  loader: () => getAgenda({ data: {} }),
   head: () => ({
     meta: [
       { title: "Agenda do Laboratório de Informática — CETI Landri Sales" },
@@ -27,6 +30,8 @@ export const Route = createFileRoute("/")({
         property: "og:description",
         content: "Agendamento semanal do Laboratório de Informática com impressão e relatórios.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Index,
@@ -35,9 +40,16 @@ export const Route = createFileRoute("/")({
 const emptyForm = { professor: "", turma: "", disciplina: "" };
 
 function Index() {
-  const [weekKey, setWeekKey] = useState(() => currentWeekKey());
-  const [data, setData] = useState<WeekData>({});
-  const [weeks, setWeeks] = useState<string[]>([]);
+  const initial = Route.useLoaderData();
+  const router = useRouter();
+  const fetchAgenda = useServerFn(getAgenda);
+  const addBooking = useServerFn(createBooking);
+  const removeBooking = useServerFn(deleteBooking);
+  const lock = useServerFn(lockSite);
+
+  const [weekKey, setWeekKey] = useState(initial.weekKey);
+  const [data, setData] = useState<WeekData>(initial.week);
+  const [weeks, setWeeks] = useState<string[]>(initial.weeks);
   const [tab, setTab] = useState<"agenda" | "relatorio">("agenda");
   const [selected, setSelected] = useState<{ day: string; slot: string } | null>(null);
   const [form, setForm] = useState(emptyForm);
@@ -45,13 +57,15 @@ function Index() {
   const [pass, setPass] = useState("");
   const [passError, setPassError] = useState("");
   const [toast, setToast] = useState("");
+  const [busy, setBusy] = useState(false);
 
-  useEffect(() => {
-    const wk = currentWeekKey();
-    setWeekKey(wk);
-    setData(loadWeek(wk));
-    setWeeks(listWeeks());
-  }, []);
+  async function refresh(wk = weekKey) {
+    const res = await fetchAgenda({ data: { weekKey: wk } });
+    setWeekKey(res.weekKey);
+    setData(res.week);
+    setWeeks(res.weeks);
+  }
+
 
   useEffect(() => {
     if (!toast) return;
