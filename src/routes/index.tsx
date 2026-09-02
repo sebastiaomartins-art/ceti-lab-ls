@@ -500,6 +500,36 @@ function Index() {
   );
 }
 
+function StatCard({
+  label,
+  value,
+  hint,
+  progress,
+}: {
+  label: string;
+  value: string;
+  hint?: string;
+  progress?: number;
+}) {
+  return (
+    <div className="print-full rounded-2xl border bg-card p-4 shadow-card">
+      <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+        {label}
+      </p>
+      <p className="mt-1 font-display text-3xl font-bold text-primary">{value}</p>
+      {typeof progress === "number" && (
+        <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-secondary">
+          <div
+            className="h-full rounded-full bg-accent transition-all"
+            style={{ width: `${Math.min(progress, 100)}%` }}
+          />
+        </div>
+      )}
+      {hint && <p className="mt-1 truncate text-xs text-muted-foreground">{hint}</p>}
+    </div>
+  );
+}
+
 function Row({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between border-b border-dashed pb-2 last:border-0">
