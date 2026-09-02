@@ -279,17 +279,17 @@ function Index() {
         </section>
 
         {tab === "agenda" ? (
-          <div className="print-full overflow-x-auto rounded-xl border bg-card shadow-sm">
+          <div className="print-full overflow-x-auto rounded-2xl border bg-card shadow-card">
             <table className="w-full min-w-[900px] border-collapse text-sm">
               <thead>
                 <tr>
-                  <th className="w-36 border-b border-r bg-secondary p-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  <th className="w-36 border-b border-r bg-secondary p-3 text-left text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
                     Horário
                   </th>
                   {DAYS.map((d) => (
                     <th
                       key={d.id}
-                      className="border-b border-r bg-secondary p-3 text-left text-xs font-semibold uppercase tracking-wide text-secondary-foreground last:border-r-0"
+                      className="border-b border-r bg-secondary p-3 text-center font-display text-xs font-bold uppercase tracking-wider text-primary last:border-r-0"
                     >
                       {d.label}
                     </th>
@@ -301,13 +301,13 @@ function Index() {
                   const isBreak = s.type !== "aula";
                   return (
                     <tr key={s.id}>
-                      <td className="border-b border-r bg-secondary/60 p-3 font-medium">
+                      <td className="border-b border-r bg-secondary/50 p-3 text-xs font-bold text-foreground">
                         {s.label}
                       </td>
                       {isBreak ? (
                         <td
                           colSpan={DAYS.length}
-                          className="border-b p-3 text-center text-xs font-semibold uppercase tracking-widest text-muted-foreground"
+                          className="border-b bg-muted p-2 text-center text-[10px] font-bold uppercase tracking-[0.25em] text-muted-foreground"
                         >
                           {s.type === "almoco" ? "Almoço" : "Intervalo"}
                         </td>
@@ -321,11 +321,13 @@ function Index() {
                               className="border-b border-r p-2 align-top last:border-r-0"
                             >
                               {b ? (
-                                <div className="rounded-lg border border-primary/30 bg-primary-soft p-2">
-                                  <p className="font-semibold text-secondary-foreground">
+                                <div className="group rounded-xl border border-primary/20 bg-primary-soft p-2.5">
+                                  <p className="font-display text-sm font-bold text-primary">
                                     {b.turma}
                                   </p>
-                                  <p className="text-xs text-muted-foreground">{b.professor}</p>
+                                  <p className="mt-0.5 text-[13px] font-semibold text-foreground">
+                                    {b.professor}
+                                  </p>
                                   {b.disciplina && (
                                     <p className="text-xs text-muted-foreground">{b.disciplina}</p>
                                   )}
@@ -336,7 +338,7 @@ function Index() {
                                         setPass("");
                                         setPassError("");
                                       }}
-                                      className="no-print mt-1 text-xs font-medium text-destructive hover:underline"
+                                      className="no-print mt-1.5 text-[11px] font-semibold text-destructive opacity-0 transition-opacity hover:underline focus:opacity-100 group-hover:opacity-100"
                                     >
                                       Excluir
                                     </button>
@@ -348,7 +350,7 @@ function Index() {
                                     setSelected({ day: d.id, slot: s.id });
                                     setForm(emptyForm);
                                   }}
-                                  className="no-print w-full rounded-lg border border-dashed border-border py-3 text-xs text-muted-foreground transition-colors hover:border-primary hover:text-primary"
+                                  className="no-print w-full rounded-xl border border-dashed border-border py-4 text-xs font-semibold text-muted-foreground transition-colors hover:border-accent hover:bg-primary-soft/60 hover:text-primary"
                                 >
                                   + Agendar
                                 </button>
