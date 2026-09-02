@@ -167,29 +167,32 @@ function Index() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b bg-card">
-        <div className="mx-auto flex max-w-[1400px] flex-wrap items-center justify-between gap-4 px-5 py-5">
+      <header className="sticky top-0 z-30 border-b bg-card/95 backdrop-blur">
+        <div className="mx-auto flex max-w-[1400px] flex-wrap items-center justify-between gap-4 px-5 py-4">
           <div className="flex items-center gap-3">
-            <div className="grid size-11 place-items-center rounded-xl bg-primary text-primary-foreground font-display text-lg font-bold">
+            <div className="grid size-12 place-items-center rounded-2xl bg-primary font-display text-lg font-bold tracking-tight text-primary-foreground shadow-card">
               CL
             </div>
             <div>
-              <h1 className="text-xl font-bold leading-tight">
+              <h1 className="font-display text-xl font-bold leading-tight">
                 Laboratório de Informática
               </h1>
               <p className="text-sm text-muted-foreground">
-                CETI Landri Sales — Agenda semanal
+                CETI Landri Sales — Agenda semanal{" "}
+                <span className="ml-1 rounded-full bg-primary-soft px-2 py-0.5 text-[11px] font-semibold text-primary">
+                  v3.0
+                </span>
               </p>
             </div>
           </div>
 
           <div className="no-print flex flex-wrap items-center gap-2">
-            <div className="flex rounded-lg border bg-secondary p-1">
+            <div className="flex rounded-xl border bg-secondary p-1">
               {(["agenda", "relatorio"] as const).map((t) => (
                 <button
                   key={t}
                   onClick={() => setTab(t)}
-                  className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors ${
+                  className={`rounded-lg px-4 py-1.5 text-sm font-semibold transition-colors ${
                     tab === t
                       ? "bg-card text-primary shadow-sm"
                       : "text-muted-foreground hover:text-foreground"
@@ -201,13 +204,13 @@ function Index() {
             </div>
             <button
               onClick={() => window.print()}
-              className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+              className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-card transition-colors hover:bg-primary-strong"
             >
-              Imprimir agenda semanal
+              Imprimir agenda
             </button>
             <button
               onClick={() => void sair()}
-              className="rounded-lg border px-4 py-2 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground"
+              className="rounded-xl border bg-card px-4 py-2 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground"
             >
               Sair
             </button>
@@ -217,9 +220,9 @@ function Index() {
       </header>
 
       <main className="mx-auto max-w-[1400px] px-5 py-6">
-        <section className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-primary-soft px-4 py-3">
+        <section className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-primary/15 bg-primary-soft px-5 py-4">
           <div>
-            <p className="text-sm font-semibold text-secondary-foreground">
+            <p className="font-display text-base font-bold text-primary">
               Semana de {weekRangeLabel(weekKey)}
             </p>
             <p className="text-xs text-muted-foreground">
@@ -232,7 +235,7 @@ function Index() {
             <select
               value={weekKey}
               onChange={(e) => openWeek(e.target.value)}
-              className="rounded-lg border bg-card px-3 py-2 text-sm"
+              className="rounded-xl border bg-card px-3 py-2 text-sm font-medium outline-none focus:border-primary focus:ring-2 focus:ring-ring/30"
               aria-label="Selecionar semana"
             >
               {(weeks.includes(currentWeekKey()) ? weeks : [currentWeekKey(), ...weeks]).map(
@@ -247,7 +250,7 @@ function Index() {
             {!isCurrentWeek && (
               <button
                 onClick={() => openWeek(currentWeekKey())}
-                className="rounded-lg border bg-card px-3 py-2 text-sm font-medium"
+                className="rounded-xl border bg-card px-3 py-2 text-sm font-medium"
               >
                 Voltar para a semana atual
               </button>
@@ -255,18 +258,38 @@ function Index() {
           </div>
         </section>
 
+        <section className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
+          <StatCard label="Agendamentos" value={String(stats.total)} hint="nesta semana" />
+          <StatCard
+            label="Horários livres"
+            value={String(Math.max(stats.capacidade - stats.total, 0))}
+            hint={`de ${stats.capacidade} disponíveis`}
+          />
+          <StatCard
+            label="Ocupação"
+            value={`${stats.ocupacao}%`}
+            hint="do laboratório"
+            progress={stats.ocupacao}
+          />
+          <StatCard
+            label="Professores"
+            value={String(stats.porProfessor.length)}
+            hint={stats.porProfessor[0] ? `mais ativo: ${stats.porProfessor[0][0]}` : "nenhum ainda"}
+          />
+        </section>
+
         {tab === "agenda" ? (
-          <div className="print-full overflow-x-auto rounded-xl border bg-card shadow-sm">
+          <div className="print-full overflow-x-auto rounded-2xl border bg-card shadow-card">
             <table className="w-full min-w-[900px] border-collapse text-sm">
               <thead>
                 <tr>
-                  <th className="w-36 border-b border-r bg-secondary p-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  <th className="w-36 border-b border-r bg-secondary p-3 text-left text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
                     Horário
                   </th>
                   {DAYS.map((d) => (
                     <th
                       key={d.id}
-                      className="border-b border-r bg-secondary p-3 text-left text-xs font-semibold uppercase tracking-wide text-secondary-foreground last:border-r-0"
+                      className="border-b border-r bg-secondary p-3 text-center font-display text-xs font-bold uppercase tracking-wider text-primary last:border-r-0"
                     >
                       {d.label}
                     </th>
@@ -278,13 +301,13 @@ function Index() {
                   const isBreak = s.type !== "aula";
                   return (
                     <tr key={s.id}>
-                      <td className="border-b border-r bg-secondary/60 p-3 font-medium">
+                      <td className="border-b border-r bg-secondary/50 p-3 text-xs font-bold text-foreground">
                         {s.label}
                       </td>
                       {isBreak ? (
                         <td
                           colSpan={DAYS.length}
-                          className="border-b p-3 text-center text-xs font-semibold uppercase tracking-widest text-muted-foreground"
+                          className="border-b bg-muted p-2 text-center text-[10px] font-bold uppercase tracking-[0.25em] text-muted-foreground"
                         >
                           {s.type === "almoco" ? "Almoço" : "Intervalo"}
                         </td>
@@ -298,11 +321,13 @@ function Index() {
                               className="border-b border-r p-2 align-top last:border-r-0"
                             >
                               {b ? (
-                                <div className="rounded-lg border border-primary/30 bg-primary-soft p-2">
-                                  <p className="font-semibold text-secondary-foreground">
+                                <div className="group rounded-xl border border-primary/20 bg-primary-soft p-2.5">
+                                  <p className="font-display text-sm font-bold text-primary">
                                     {b.turma}
                                   </p>
-                                  <p className="text-xs text-muted-foreground">{b.professor}</p>
+                                  <p className="mt-0.5 text-[13px] font-semibold text-foreground">
+                                    {b.professor}
+                                  </p>
                                   {b.disciplina && (
                                     <p className="text-xs text-muted-foreground">{b.disciplina}</p>
                                   )}
@@ -313,7 +338,7 @@ function Index() {
                                         setPass("");
                                         setPassError("");
                                       }}
-                                      className="no-print mt-1 text-xs font-medium text-destructive hover:underline"
+                                      className="no-print mt-1.5 text-[11px] font-semibold text-destructive opacity-0 transition-opacity hover:underline focus:opacity-100 group-hover:opacity-100"
                                     >
                                       Excluir
                                     </button>
@@ -325,7 +350,7 @@ function Index() {
                                     setSelected({ day: d.id, slot: s.id });
                                     setForm(emptyForm);
                                   }}
-                                  className="no-print w-full rounded-lg border border-dashed border-border py-3 text-xs text-muted-foreground transition-colors hover:border-primary hover:text-primary"
+                                  className="no-print w-full rounded-xl border border-dashed border-border py-4 text-xs font-semibold text-muted-foreground transition-colors hover:border-accent hover:bg-primary-soft/60 hover:text-primary"
                                 >
                                   + Agendar
                                 </button>
@@ -473,6 +498,36 @@ function Index() {
           {toast}
         </div>
       )}
+    </div>
+  );
+}
+
+function StatCard({
+  label,
+  value,
+  hint,
+  progress,
+}: {
+  label: string;
+  value: string;
+  hint?: string;
+  progress?: number;
+}) {
+  return (
+    <div className="print-full rounded-2xl border bg-card p-4 shadow-card">
+      <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+        {label}
+      </p>
+      <p className="mt-1 font-display text-3xl font-bold text-primary">{value}</p>
+      {typeof progress === "number" && (
+        <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-secondary">
+          <div
+            className="h-full rounded-full bg-accent transition-all"
+            style={{ width: `${Math.min(progress, 100)}%` }}
+          />
+        </div>
+      )}
+      {hint && <p className="mt-1 truncate text-xs text-muted-foreground">{hint}</p>}
     </div>
   );
 }
