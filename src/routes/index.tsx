@@ -167,29 +167,32 @@ function Index() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b bg-card">
-        <div className="mx-auto flex max-w-[1400px] flex-wrap items-center justify-between gap-4 px-5 py-5">
+      <header className="sticky top-0 z-30 border-b bg-card/95 backdrop-blur">
+        <div className="mx-auto flex max-w-[1400px] flex-wrap items-center justify-between gap-4 px-5 py-4">
           <div className="flex items-center gap-3">
-            <div className="grid size-11 place-items-center rounded-xl bg-primary text-primary-foreground font-display text-lg font-bold">
+            <div className="grid size-12 place-items-center rounded-2xl bg-primary font-display text-lg font-bold tracking-tight text-primary-foreground shadow-card">
               CL
             </div>
             <div>
-              <h1 className="text-xl font-bold leading-tight">
+              <h1 className="font-display text-xl font-bold leading-tight">
                 Laboratório de Informática
               </h1>
               <p className="text-sm text-muted-foreground">
-                CETI Landri Sales — Agenda semanal
+                CETI Landri Sales — Agenda semanal{" "}
+                <span className="ml-1 rounded-full bg-primary-soft px-2 py-0.5 text-[11px] font-semibold text-primary">
+                  v3.0
+                </span>
               </p>
             </div>
           </div>
 
           <div className="no-print flex flex-wrap items-center gap-2">
-            <div className="flex rounded-lg border bg-secondary p-1">
+            <div className="flex rounded-xl border bg-secondary p-1">
               {(["agenda", "relatorio"] as const).map((t) => (
                 <button
                   key={t}
                   onClick={() => setTab(t)}
-                  className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors ${
+                  className={`rounded-lg px-4 py-1.5 text-sm font-semibold transition-colors ${
                     tab === t
                       ? "bg-card text-primary shadow-sm"
                       : "text-muted-foreground hover:text-foreground"
@@ -201,13 +204,13 @@ function Index() {
             </div>
             <button
               onClick={() => window.print()}
-              className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+              className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-card transition-colors hover:bg-primary-strong"
             >
-              Imprimir agenda semanal
+              Imprimir agenda
             </button>
             <button
               onClick={() => void sair()}
-              className="rounded-lg border px-4 py-2 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground"
+              className="rounded-xl border bg-card px-4 py-2 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground"
             >
               Sair
             </button>
@@ -217,9 +220,9 @@ function Index() {
       </header>
 
       <main className="mx-auto max-w-[1400px] px-5 py-6">
-        <section className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-primary-soft px-4 py-3">
+        <section className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-primary/15 bg-primary-soft px-5 py-4">
           <div>
-            <p className="text-sm font-semibold text-secondary-foreground">
+            <p className="font-display text-base font-bold text-primary">
               Semana de {weekRangeLabel(weekKey)}
             </p>
             <p className="text-xs text-muted-foreground">
@@ -232,7 +235,7 @@ function Index() {
             <select
               value={weekKey}
               onChange={(e) => openWeek(e.target.value)}
-              className="rounded-lg border bg-card px-3 py-2 text-sm"
+              className="rounded-xl border bg-card px-3 py-2 text-sm font-medium outline-none focus:border-primary focus:ring-2 focus:ring-ring/30"
               aria-label="Selecionar semana"
             >
               {(weeks.includes(currentWeekKey()) ? weeks : [currentWeekKey(), ...weeks]).map(
@@ -247,12 +250,32 @@ function Index() {
             {!isCurrentWeek && (
               <button
                 onClick={() => openWeek(currentWeekKey())}
-                className="rounded-lg border bg-card px-3 py-2 text-sm font-medium"
+                className="rounded-xl border bg-card px-3 py-2 text-sm font-medium"
               >
                 Voltar para a semana atual
               </button>
             )}
           </div>
+        </section>
+
+        <section className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
+          <StatCard label="Agendamentos" value={String(stats.total)} hint="nesta semana" />
+          <StatCard
+            label="Horários livres"
+            value={String(Math.max(stats.capacidade - stats.total, 0))}
+            hint={`de ${stats.capacidade} disponíveis`}
+          />
+          <StatCard
+            label="Ocupação"
+            value={`${stats.ocupacao}%`}
+            hint="do laboratório"
+            progress={stats.ocupacao}
+          />
+          <StatCard
+            label="Professores"
+            value={String(stats.porProfessor.length)}
+            hint={stats.porProfessor[0] ? `mais ativo: ${stats.porProfessor[0][0]}` : "nenhum ainda"}
+          />
         </section>
 
         {tab === "agenda" ? (
