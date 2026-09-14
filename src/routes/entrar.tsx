@@ -51,14 +51,16 @@ function Entrar() {
   }
 
   return (
-    <div className="grid min-h-screen place-items-center bg-background px-5 py-10">
-      <div className="w-full max-w-sm rounded-2xl border bg-card p-7 shadow-sm">
+    <div className="grid min-h-screen place-items-center bg-primary-soft px-5 py-10">
+      <div className="w-full max-w-sm rounded-3xl border bg-card p-8 shadow-card">
         <div className="mb-5 flex items-center gap-3">
-          <div className="grid size-11 place-items-center rounded-xl bg-primary font-display text-lg font-bold text-primary-foreground">
+          <div className="grid size-12 place-items-center rounded-2xl bg-primary font-display text-lg font-bold text-primary-foreground shadow-card">
             CL
           </div>
           <div>
-            <h1 className="text-lg font-bold leading-tight">Laboratório de Informática</h1>
+            <h1 className="font-display text-lg font-bold leading-tight">
+              Laboratório de Informática
+            </h1>
             <p className="text-sm text-muted-foreground">CETI Landri Sales</p>
           </div>
         </div>
