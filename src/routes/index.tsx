@@ -443,13 +443,13 @@ function Index() {
               <button
                 type="button"
                 onClick={() => setSelected(null)}
-                className="rounded-lg border px-4 py-2 text-sm font-medium"
+                className="rounded-xl border px-4 py-2 text-sm font-medium"
               >
                 Cancelar
               </button>
               <button
                 type="submit"
-                className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground"
+                className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-strong"
               >
                 Salvar agendamento
               </button>
@@ -480,13 +480,13 @@ function Index() {
               <button
                 type="button"
                 onClick={() => setPendingDelete(null)}
-                className="rounded-lg border px-4 py-2 text-sm font-medium"
+                className="rounded-xl border px-4 py-2 text-sm font-medium"
               >
                 Cancelar
               </button>
               <button
                 type="submit"
-                className="rounded-lg bg-destructive px-4 py-2 text-sm font-semibold text-destructive-foreground"
+                className="rounded-xl bg-destructive px-4 py-2 text-sm font-semibold text-destructive-foreground"
               >
                 Confirmar exclusão
               </button>
