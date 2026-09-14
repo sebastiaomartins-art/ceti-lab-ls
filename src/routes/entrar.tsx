@@ -51,14 +51,16 @@ function Entrar() {
   }
 
   return (
-    <div className="grid min-h-screen place-items-center bg-background px-5 py-10">
-      <div className="w-full max-w-sm rounded-2xl border bg-card p-7 shadow-sm">
+    <div className="grid min-h-screen place-items-center bg-primary-soft px-5 py-10">
+      <div className="w-full max-w-sm rounded-3xl border bg-card p-8 shadow-card">
         <div className="mb-5 flex items-center gap-3">
-          <div className="grid size-11 place-items-center rounded-xl bg-primary font-display text-lg font-bold text-primary-foreground">
+          <div className="grid size-12 place-items-center rounded-2xl bg-primary font-display text-lg font-bold text-primary-foreground shadow-card">
             CL
           </div>
           <div>
-            <h1 className="text-lg font-bold leading-tight">Laboratório de Informática</h1>
+            <h1 className="font-display text-lg font-bold leading-tight">
+              Laboratório de Informática
+            </h1>
             <p className="text-sm text-muted-foreground">CETI Landri Sales</p>
           </div>
         </div>
@@ -80,14 +82,14 @@ function Entrar() {
                 setPassword(e.target.value);
                 setError("");
               }}
-              className="w-full rounded-lg border bg-background px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-ring/30"
+              className="w-full rounded-xl border bg-background px-3 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-ring/30"
             />
           </label>
           {error && <p className="text-sm text-destructive">{error}</p>}
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-60"
+            className="w-full rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-card transition-colors hover:bg-primary-strong disabled:opacity-60"
           >
             {loading ? "Entrando…" : "Entrar"}
           </button>

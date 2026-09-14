@@ -369,15 +369,15 @@ function Index() {
           </div>
         ) : (
           <div className="grid gap-4 lg:grid-cols-3">
-            <div className="print-full rounded-xl border bg-card p-5 shadow-sm">
-              <h2 className="text-base font-bold">Resumo da semana</h2>
+            <div className="print-full rounded-2xl border bg-card p-5 shadow-card">
+              <h2 className="font-display text-base font-bold">Resumo da semana</h2>
               <div className="mt-4 space-y-3 text-sm">
                 <Row label="Agendamentos" value={String(stats.total)} />
                 <Row label="Horários disponíveis" value={String(stats.capacidade)} />
                 <Row label="Taxa de ocupação" value={`${stats.ocupacao}%`} />
                 <div className="h-2 overflow-hidden rounded-full bg-secondary">
                   <div
-                    className="h-full bg-primary"
+                    className="h-full rounded-full bg-accent"
                     style={{ width: `${stats.ocupacao}%` }}
                   />
                 </div>
@@ -405,8 +405,10 @@ function Index() {
         )}
       </main>
 
-      <footer className="border-t py-6 text-center text-sm text-muted-foreground">
-        <p className="font-medium">CETI Landri Sales — Laboratório de Informática</p>
+      <footer className="mt-6 border-t bg-card py-7 text-center text-sm text-muted-foreground">
+        <p className="font-display font-bold text-primary">
+          CETI Landri Sales — Laboratório de Informática
+        </p>
         <p className="mt-1">Desenvolvido por: Sebastião Martins 3ºA TDS</p>
       </footer>
 
@@ -441,13 +443,13 @@ function Index() {
               <button
                 type="button"
                 onClick={() => setSelected(null)}
-                className="rounded-lg border px-4 py-2 text-sm font-medium"
+                className="rounded-xl border px-4 py-2 text-sm font-medium"
               >
                 Cancelar
               </button>
               <button
                 type="submit"
-                className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground"
+                className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-strong"
               >
                 Salvar agendamento
               </button>
@@ -478,13 +480,13 @@ function Index() {
               <button
                 type="button"
                 onClick={() => setPendingDelete(null)}
-                className="rounded-lg border px-4 py-2 text-sm font-medium"
+                className="rounded-xl border px-4 py-2 text-sm font-medium"
               >
                 Cancelar
               </button>
               <button
                 type="submit"
-                className="rounded-lg bg-destructive px-4 py-2 text-sm font-semibold text-destructive-foreground"
+                className="rounded-xl bg-destructive px-4 py-2 text-sm font-semibold text-destructive-foreground"
               >
                 Confirmar exclusão
               </button>
@@ -551,8 +553,8 @@ function ListCard({
   empty: string;
 }) {
   return (
-    <div className="print-full rounded-xl border bg-card p-5 shadow-sm">
-      <h2 className="text-base font-bold">{title}</h2>
+    <div className="print-full rounded-2xl border bg-card p-5 shadow-card">
+      <h2 className="font-display text-base font-bold">{title}</h2>
       {items.length === 0 ? (
         <p className="mt-4 text-sm text-muted-foreground">{empty}</p>
       ) : (
@@ -595,7 +597,7 @@ function Field({
         required={required}
         placeholder={placeholder}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-lg border bg-background px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-ring/30"
+        className="w-full rounded-xl border bg-background px-3 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-ring/30"
       />
     </label>
   );
