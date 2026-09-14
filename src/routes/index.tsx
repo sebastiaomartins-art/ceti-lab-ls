@@ -553,8 +553,8 @@ function ListCard({
   empty: string;
 }) {
   return (
-    <div className="print-full rounded-xl border bg-card p-5 shadow-sm">
-      <h2 className="text-base font-bold">{title}</h2>
+    <div className="print-full rounded-2xl border bg-card p-5 shadow-card">
+      <h2 className="font-display text-base font-bold">{title}</h2>
       {items.length === 0 ? (
         <p className="mt-4 text-sm text-muted-foreground">{empty}</p>
       ) : (
@@ -597,7 +597,7 @@ function Field({
         required={required}
         placeholder={placeholder}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-lg border bg-background px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-ring/30"
+        className="w-full rounded-xl border bg-background px-3 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-ring/30"
       />
     </label>
   );
